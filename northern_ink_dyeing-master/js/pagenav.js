@@ -105,7 +105,11 @@
 		},
 
 		getHash: function($link) {
-			return $link.attr('href').split('#')[1];
+			var href = $link.attr('href');
+			if (!href || href.indexOf('#') === -1) {
+				return null;
+			}
+			return href.split('#')[1];
 		},
 
 		getPositions: function() {
