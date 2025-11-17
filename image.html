@@ -5,51 +5,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片展示</title>
+    <title>图片与视频展示</title>
     <!-- 禁用右键菜单 -->
-    <script src="./js/limit.js"></script>
-    <script>
-        document.oncontextmenu = function () {
-            return false;
-        }
-    </script>
-    <!-- 禁用选择文本 -->
+    <!-- <script src="./js/limit.js"></script> -->
+    
+    <!-- 整合的样式 -->
     <style>
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* 禁用图片拖动 */
-        img {
-            pointer-events: none;
-            -webkit-user-drag: none;
-            -khtml-user-drag: none;
-            -moz-user-drag: none;
-            -o-user-drag: none;
-        }
-
-
-
-        /* 禁用图片容器上的选择和右键 */
-        .image-container {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            pointer-events: auto;
-        }
-    </style>
-    <style>
+        /* 基础样式 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
+        /* 布局样式 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -67,7 +41,15 @@
             justify-content: center;
         }
 
-        .image-container {
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* 图片和视频容器样式 */
+        .image-container, .video-container {
             position: relative;
             overflow: hidden;
             border-radius: 8px;
@@ -75,20 +57,41 @@
             transition: transform 0.3s ease;
             background-color: white;
             padding: 10px;
+            width: 300px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: auto;
         }
 
-        .image-container:hover {
+        .image-container:hover, .video-container:hover {
             transform: scale(1.05);
         }
 
+        /* 图片样式 */
         .image-container img {
-            width: 300px;
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
+
+        /* 视频样式 */
+        .video-container video {
+            width: 100%;
             height: 400px;
             object-fit: cover;
             display: block;
         }
 
-        .image-name {
+        /* 名称样式 */
+        .image-name, .video-name {
             padding: 8px;
             text-align: center;
             font-size: 14px;
@@ -98,13 +101,7 @@
             text-overflow: ellipsis;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #666;
-        }
-
+        /* 链接样式 */
         .github-link {
             display: inline-block;
             padding: 10px 20px;
@@ -119,13 +116,22 @@
         .github-link:hover {
             background-color: #555;
         }
+
+        /* 加载提示样式 */
+        .loading-message {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1>图片展示</h1>
+            <h1>图片与视频展示</h1>
             <a href="https://simon-mzg.github.io/resources/" target="_blank" rel="noopener noreferrer"
                 class="github-link">
                 访问 GitHub 资源库
@@ -133,18 +139,26 @@
         </div>
 
         <div class="gallery" id="imageGallery">
+            <div class="loading-message">正在加载图片...</div>
             <!-- 图片将通过JavaScript动态加载 -->
         </div>
 
+        <div class="gallery" id="videoGallery">
+            <div class="loading-message">正在加载视频...</div>
+            <!-- 视频将通过JavaScript动态加载 -->
+        </div>
+
         <div class="footer">
-            <p>图片展示页面 - 自动加载 image/xz/ 目录下的所有图片</p>
+            <p>图片与视频展示页面 - 自动加载 image/xz/ 目录下的所有图片和 video/ 目录下的所有视频</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const gallery = document.getElementById('imageGallery');
+            const imageGallery = document.getElementById('imageGallery');
+            const videoGallery = document.getElementById('videoGallery');
             const imageDir = 'image/xz';
+            const videoDir = 'image/xz'; 
 
             // 尝试获取目录中的所有图片
             // 注意：由于浏览器安全限制，直接读取本地目录不可行
@@ -177,22 +191,25 @@
                             // 手动添加斜杠，因为之前已经移除了imageDir的结尾斜杠
                             const imagePath = href;
 
-                            console.log(imagePath)
-                            createImageElement(imagePath);
+                            // console.log(imagePath)
+                            createImageElement(imagePath, imageGallery);
                         });
+
+                        // 移除加载提示
+                        removeLoadingMessage(imageGallery);
                     } else {
                         // 如果没有找到图片，使用备用方案
-                        loadFallbackImages();
+                        loadFallbackImages(imageGallery);
                     }
                 })
                 .catch(error => {
                     console.error('加载目录失败:', error);
                     // 使用备用方案
-                    loadFallbackImages();
+                    loadFallbackImages(imageGallery);
                 });
 
             // 创建图片元素的函数
-            function createImageElement(imagePath) {
+            function createImageElement(imagePath, gallery) {
                 const container = document.createElement('div');
                 container.className = 'image-container';
 
@@ -242,8 +259,19 @@
                 gallery.appendChild(container);
             }
 
+            // 移除加载提示的函数
+            function removeLoadingMessage(gallery) {
+                const loadingMessage = gallery.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.remove();
+                }
+            }
+
             // 备用方案：预定义的图片列表
-            function loadFallbackImages() {
+            function loadFallbackImages(gallery) {
+                // 移除加载提示
+                removeLoadingMessage(gallery);
+
                 const fallbackImages = [
                     'videoframe_2381.png',
                     'o0FzINDnAobAlRRAflPpAbYQOAeb19AtbkCgSg~tplv-dy-aweme-images_q75.png',
@@ -253,7 +281,7 @@
                 fallbackImages.forEach(imageName => {
                     // 使用与主逻辑相同的路径拼接方式
                     const imagePath = imageDir + '/' + imageName;
-                    createImageElement(imagePath);
+                    createImageElement(imagePath, gallery);
                 });
 
                 // 显示提示信息
@@ -263,6 +291,136 @@
                 infoDiv.style.marginTop = '20px';
                 infoDiv.style.color = '#666';
                 infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的图片列表。';
+                document.querySelector('.container').appendChild(infoDiv);
+            }
+
+            // 加载视频
+            loadVideos();
+
+            function loadVideos() {
+                // 方法1：尝试获取目录索引（如果服务器启用了目录列表）
+                fetch(videoDir)
+                    .then(response => {
+                        // 检查响应是否包含HTML（目录列表）
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text();
+                        }
+                        throw new Error('无法获取视频目录列表');
+                    })
+                    .then(html => {
+                        // 解析HTML，提取视频文件名
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const links = doc.querySelectorAll('a[href$=".mp4"], a[href$=".webm"], a[href$=".ogg"], a[href$=".avi"], a[href$=".mov"]');
+
+                        if (links.length > 0) {
+                            // 如果找到视频链接，创建视频元素
+                            links.forEach(link => {
+                                let href = link.getAttribute('href');
+                                // console.log(href);
+                                // 确保路径正确拼接，避免双斜杠
+                                if (href.startsWith('/')) {
+                                    href = href.substring(1);
+                                }
+                                // 手动添加斜杠，因为之前已经移除了videoDir的结尾斜杠
+                                const videoPath = href;
+
+                                // console.log(videoPath);
+                                createVideoElement(videoPath);
+                            });
+
+                            // 移除加载提示
+                            removeLoadingMessage(videoGallery);
+                        } else {
+                            // 如果没有找到视频，使用备用方案
+                            loadFallbackVideos();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载视频目录失败:', error);
+                        // 使用备用方案
+                        loadFallbackVideos();
+                    });
+            }
+
+            // 创建视频元素的函数
+            function createVideoElement(videoPath) {
+                const container = document.createElement('div');
+                container.className = 'video-container';
+
+                const video = document.createElement('video');
+                video.src = videoPath;
+                video.controls = true; // 显示视频控制条
+                video.preload = 'metadata'; // 预加载元数据
+
+                // 防止右键菜单
+                video.oncontextmenu = function () {
+                    return false;
+                };
+
+                // 防止拖拽
+                video.ondragstart = function () {
+                    return false;
+                };
+
+                // 防止长按保存（移动设备）
+                video.ontouchstart = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止双击保存
+                video.ondblclick = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止复制
+                video.oncopy = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                video.onerror = function () {
+                    // 如果视频加载失败，隐藏容器
+                    container.style.display = 'none';
+                    console.warn('无法加载视频:', videoPath);
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'video-name';
+                nameDiv.textContent = videoPath.split('/').pop(); // 获取文件名作为视频名称
+
+                container.appendChild(video);
+                container.appendChild(nameDiv);
+                videoGallery.appendChild(container);
+            }
+
+            // 备用方案：预定义的视频列表
+            function loadFallbackVideos() {
+                // 移除加载提示
+                removeLoadingMessage(videoGallery);
+
+                const fallbackVideos = [
+                    'sample1.mp4',
+                    'sample2.mp4',
+                    'sample3.mp4'
+                ];
+
+                fallbackVideos.forEach(videoName => {
+                    // 使用与主逻辑相同的路径拼接方式
+                    const videoPath = videoDir + '/' + videoName;
+                    createVideoElement(videoPath);
+                });
+
+                // 显示提示信息
+                const infoDiv = document.createElement('div');
+                infoDiv.style.width = '100%';
+                infoDiv.style.textAlign = 'center';
+                infoDiv.style.marginTop = '20px';
+                infoDiv.style.color = '#666';
+                infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的视频列表。';
                 document.querySelector('.container').appendChild(infoDiv);
             }
         });
