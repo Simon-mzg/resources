@@ -1,0 +1,21 @@
+/* 内联样式提取 */
+
+/* 作者信息背景样式 */
+.author-info {
+    background-image: url(../images/background/3.jpg);
+}
+
+/* 首页背景样式 */
+.card-home {
+    background-image: url(../images/background/1.jpg);
+}
+
+/* 其他页面背景样式 */
+.card-about,
+.card-resume,
+.card-services,
+.card-projects,
+.card-blog,
+.card-contact {
+    background-image: url(../images/background/2.jpg);
+}

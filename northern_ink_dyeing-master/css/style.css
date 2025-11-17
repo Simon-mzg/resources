@@ -58,7 +58,9 @@ font-family: 'Work Sans', sans-serif;*/
 ====================================================================
 
  ***/
-
+.row{
+	width:calc(100% - 30px)
+}
 body {
 	font-size:15px;
 	color:#777777;

@@ -52,8 +52,10 @@
 
                             <div class="navbar-collapse collapse scroll-nav clearfix">
                                 <ul class="navigation clearfix">
-                                    <li v-for="nav in navigation" :key="nav.id" :class="{ current: activeSection === nav.id }">
-                                        <a :href="'#' + nav.id" @click.prevent="scrollToSection(nav.id)">{{ nav.title }}</a>
+                                    <li v-for="nav in navigation" :key="nav.id"
+                                        :class="{ current: activeSection === nav.id }">
+                                        <a :href="'#' + nav.id" @click.prevent="scrollToSection(nav.id)">{{ nav.title
+                                            }}</a>
                                     </li>
                                 </ul>
                             </div>
@@ -75,7 +77,8 @@
                                     <div class="designation">
                                         {{ profile.greeting }}
                                         <div class="typing-title">
-                                            <p v-for="title in profile.titles" :key="title">我是  <strong>{{ title }}</strong></p>
+                                            <p v-for="title in profile.titles" :key="title">我是 <strong>{{ title
+                                                    }}</strong></p>
                                         </div>
                                         <span class="typed-title"></span>
                                     </div>
@@ -85,23 +88,30 @@
                                 </div>
                                 <ul class="social-icon-two">
                                     <li v-for="social in profile.socialLinks" :key="social.name">
-                                        <a :href="social.url" :title="social.name"><span :class="social.icon"></span></a>
+                                        <a :href="social.url" :title="social.name"><span
+                                                :class="social.icon"></span></a>
                                     </li>
                                 </ul>
                             </div>
                             <div class="card-inner-box">
                                 <header class="header wow fadeInLeft" data-wow-duration="1.5s">
                                     <ul class="main-menu">
-                                        <!-- <li :class="{ active: activeSection === 'home', home: true }">
-                                            <a class="logo" href="#home" @click.prevent="scrollToSection('home')">
-                                                <img src="images/logo.png" alt="">
-                                            </a>
-                                        </li> -->
-                                        <li v-for="nav in navigation" :key="nav.id">
-                                            <a :href="'#' + nav.id" @click.prevent="scrollToSection(nav.id)">
-                                                <i :class="nav.icon"></i>{{ nav.title }}
-                                            </a>
-                                        </li>
+                                        <template v-for="nav in navigation" :key="nav.id">
+                                            <li :class="{ active: activeSection === 'home', home: true }"
+                                                v-if="nav.src">
+                                                <a class="logo" href="#home" @click.prevent="scrollToSection('home')">
+                                                    <img :src="nav.src" alt="">
+                                                </a>
+                                            </li>
+                                            <li v-else :class="{  home: false }">
+
+                                                <a :href="'#' + nav.id" @click.prevent="scrollToSection(nav.id)">
+                                                    <i :class="nav.icon"></i>{{ nav.title }}
+                                                </a>
+
+                                            </li>
+                                        </template>
+
                                     </ul>
                                 </header>
 
@@ -116,7 +126,8 @@
                                             <div class="designation">
                                                 {{ profile.greeting }}
                                                 <div class="typing-title">
-                                                    <p v-for="title in profile.titles" :key="title">我是  <strong>{{ title }}</strong></p>
+                                                    <p v-for="title in profile.titles" :key="title">我是 <strong>{{ title
+                                                            }}</strong></p>
                                                 </div>
                                                 <span class="typed-title"></span>
                                             </div>
@@ -124,11 +135,13 @@
                                         <div class="text">{{ profile.description }}</div>
                                         <div class="link-btn">
                                             <a :href="profile.cvLink" class="theme-btn btn-style-one">Download CV</a>
-                                            <a href="#contact" @click.prevent="scrollToSection('contact')" class="theme-btn btn-style-two">Hire Me</a>
+                                            <a href="#contact" @click.prevent="scrollToSection('contact')"
+                                                class="theme-btn btn-style-two">Hire Me</a>
                                         </div>
                                         <ul class="social-icon-two">
                                             <li v-for="social in profile.socialLinks" :key="social.name">
-                                                <a :href="social.url" :title="social.name"><span :class="social.icon"></span></a>
+                                                <a :href="social.url" :title="social.name"><span
+                                                        :class="social.icon"></span></a>
                                             </li>
                                         </ul>
                                     </div>
@@ -137,8 +150,8 @@
                                 <!-- end item -->
 
                                 <!-- About Section -->
-                                <div class="card-about card-item" :class="{ active: activeSection === 'about' }" id="about"
-                                    style="background-image:url(images/background/2.jpg)">
+                                <div class="card-about card-item" :class="{ active: activeSection === 'about' }"
+                                    id="about" style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
                                         <h4 class="title">About Me</h4>
                                         <div class="text">{{ about.description }}</div>
@@ -147,7 +160,7 @@
                                                 <div class="col-md-6">
                                                     <ul class="list-style-one">
                                                         <li v-for="info in about.infoList1" :key="info.label">
-                                                            <strong>{{ info.label }}:</strong> 
+                                                            <strong>{{ info.label }}:</strong>
                                                             <span v-if="!info.isLink">{{ info.value }}</span>
                                                             <a v-else :href="info.value">{{ info.value }}</a>
                                                         </li>
@@ -164,17 +177,18 @@
                                         </div>
                                         <h4 class="title">Skills</h4>
                                         <div class="row">
-                                            <div class="skill-block col-md-3 col-sm-4 col-xs-6" v-for="skill in skills" :key="skill.name">
+                                            <div class="skill-block col-md-3 col-sm-4 col-xs-6" v-for="skill in skills"
+                                                :key="skill.name">
                                                 <div class="inner-box">
                                                     <div class="graph-outer">
+
                                                         <input type="text" class="dial" :data-fgColor="skill.color"
                                                             data-bgColor="#f5f5f5" data-width="90" data-height="90"
                                                             data-linecap="normal" :value="skill.percentage">
-                                                        <div class="inner-text count-box">
-                                                            <span class="count-text" :data-stop="skill.percentage" data-speed="2000"></span>%
+                                                        <div class="inner-text count-box"><span class="count-text"
+                                                                :data-stop="skill.percentage" data-speed="2000"></span>%
                                                         </div>
                                                     </div>
-                                                    <h3>{{ skill.name }}</h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -183,8 +197,8 @@
                                 <!-- end item -->
 
                                 <!-- Resume Section -->
-                                <div class="card-resume card-item" :class="{ active: activeSection === 'resume' }" id="resume"
-                                    style="background-image:url(images/background/2.jpg)">
+                                <div class="card-resume card-item" :class="{ active: activeSection === 'resume' }"
+                                    id="resume" style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
                                         <h4 class="title">Resume</h4>
                                         <div class="row clearfix">
@@ -194,16 +208,19 @@
                                                     <div class="col-header">
                                                         <div class="icon-box">
                                                             <div class="icon-inner">
-                                                                <div class="icon"><span class="flaticon-book"></span></div>
+                                                                <div class="icon"><span class="flaticon-book"></span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <h2>Employment</h2>
                                                     </div>
 
-                                                    <div class="timeline-block" v-for="item in resume.employment" :key="item.title">
+                                                    <div class="timeline-block" v-for="item in resume.employment"
+                                                        :key="item.title">
                                                         <div class="inner-box">
                                                             <h4>{{ item.title }}</h4>
-                                                            <div class="date"><span>{{ item.period }}</span> / {{ item.company }}</div>
+                                                            <div class="date"><span>{{ item.period }}</span> / {{
+                                                                item.company }}</div>
                                                             <div class="text">{{ item.description }}</div>
                                                         </div>
                                                     </div>
@@ -216,16 +233,19 @@
                                                     <div class="col-header">
                                                         <div class="icon-box">
                                                             <div class="icon-inner">
-                                                                <div class="icon"><span class="flaticon-case"></span></div>
+                                                                <div class="icon"><span class="flaticon-case"></span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <h2>Experience</h2>
                                                     </div>
 
-                                                    <div class="timeline-block" v-for="item in resume.experience" :key="item.title">
+                                                    <div class="timeline-block" v-for="item in resume.experience"
+                                                        :key="item.title">
                                                         <div class="inner-box">
                                                             <h4>{{ item.title }}</h4>
-                                                            <div class="date"><span>{{ item.period }}</span> / {{ item.company }}</div>
+                                                            <div class="date"><span>{{ item.period }}</span> / {{
+                                                                item.company }}</div>
                                                             <div class="text">{{ item.description }}</div>
                                                         </div>
                                                     </div>
@@ -235,14 +255,14 @@
                                     </div>
                                 </div>
                                 <!-- end item -->
-
                                 <!-- Services Section -->
-                                <div class="card-services card-item" :class="{ active: activeSection === 'services' }" id="services"
-                                    style="background-image:url(images/background/2.jpg)">
+                                <div class="card-services card-item" :class="{ active: activeSection === 'services' }"
+                                    id="services" style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
                                         <h4 class="title">Services</h4>
                                         <div class="row">
-                                            <div class="services-block col-md-6" v-for="service in services" :key="service.title">
+                                            <div class="services-block col-md-6" v-for="service in services"
+                                                :key="service.title">
                                                 <div class="inner-box">
                                                     <div class="icon-box"><span :class="service.icon"></span></div>
                                                     <h4><a href="#">{{ service.title }}</a></h4>
@@ -253,14 +273,14 @@
                                     </div>
                                 </div>
                                 <!-- end item -->
-
                                 <!-- Works Section -->
-                                <div class="card-projects card-item" :class="{ active: activeSection === 'work' }" id="work"
-                                    style="background-image:url(images/background/2.jpg)">
+                                <div class="card-projects card-item" :class="{ active: activeSection === 'work' }"
+                                    id="work" style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
                                         <h4 class="title">Works</h4>
                                         <div class="row">
-                                            <div class="projects-block" :class="work.colClass" v-for="work in works" :key="work.id">
+                                            <div class="projects-block" :class="work.colClass" v-for="work in works"
+                                                :key="work.id">
                                                 <div class="inner-box">
                                                     <figure class="image">
                                                         <img :src="work.image" :alt="work.title">
@@ -282,65 +302,133 @@
                                     </div>
                                 </div>
                                 <!-- end item -->
-
-                                <!-- Blog Section -->
-                                <div class="card-blog card-item" :class="{ active: activeSection === 'blog' }" id="blog"
+                                <!-- card item -->
+                                <div class="card-blog card-item" id="blog"
                                     style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
                                         <h4 class="title">Blog</h4>
-                                        <div class="news-block" v-for="post in blogPosts" :key="post.id">
+                                        <div class="news-block">
                                             <div class="inner-box">
                                                 <div class="image">
-                                                    <img :src="post.image" :alt="post.title">
+                                                    <img src="images/resource/blog-1.jpg" alt="">
                                                     <div class="overlay">
-                                                        <a class="link-btn" href="#">
+                                                        <a class="link-btn" href="blog-single.html">
                                                             <i class="fa fa-link"></i>
                                                         </a>
                                                     </div>
                                                 </div>
-                                                <div class="date"><strong>{{ post.day }}</strong> <br>{{ post.month }}</div>
+                                                <div class="date"><strong>02</strong> <br>Sep</div>
                                                 <div class="lower-content">
-                                                    <h4><a href="#">{{ post.title }}</a></h4>
-                                                    <div class="post-meta">by {{ post.author }} / <span>{{ post.category }}</span></div>
+                                                    <h4><a href="blog-single.html">Let’s Talk About Design</a></h4>
+                                                    <div class="post-meta">by admin / <span>Design</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="news-block">
+                                            <div class="inner-box">
+                                                <div class="image">
+                                                    <img src="images/resource/blog-2.jpg" alt="">
+                                                    <div class="overlay">
+                                                        <a class="link-btn" href="blog-single.html">
+                                                            <i class="fa fa-link"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="date"><strong>04</strong> <br>Sep</div>
+                                                <div class="lower-content">
+                                                    <h4><a href="blog-single.html">Let’s Talk About Design</a></h4>
+                                                    <div class="post-meta">by admin / <span>Design</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="news-block">
+                                            <div class="inner-box">
+                                                <div class="image">
+                                                    <img src="images/resource/blog-3.jpg" alt="">
+                                                    <div class="overlay">
+                                                        <a class="link-btn" href="blog-single.html">
+                                                            <i class="fa fa-link"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="date"><strong>06</strong> <br>Sep</div>
+                                                <div class="lower-content">
+                                                    <h4><a href="blog-single.html">Let’s Talk About Design</a></h4>
+                                                    <div class="post-meta">by admin / <span>Design</span></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- end item -->
-
-                                <!-- Contact Section -->
-                                <div class="card-contact card-item" :class="{ active: activeSection === 'contact' }" id="contact"
+                                <!-- card item -->
+                                <div class="card-contact card-item" id="contact"
                                     style="background-image:url(images/background/2.jpg)">
                                     <div class="card-inner">
+                                        <!-- <h3 class="title">Contact</h3>
+                                    <h4>Keep In Touch</h4>
+                                    <div class="row clearfix">
+                                        <div class="col-md-6">
+                                            <ul class="list-style-two">
+                                                <li><span class="icon flaticon-signs"></span>PO Box 16122 Collins Street
+                                                    <br> West Victoria 8007 Canada </li>
+                                                <li><span class="icon flaticon-smartphone"></span>(+48) 564-334-21-22-34
+                                                    <br>(+48) 564-334-21-25</li>
+                                                <li><span class="icon flaticon-note-1"></span>info@cretox.com
+                                                    <br>info@example.com</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="map-section">
+                                                <div class="home-google-map">
+                                                    <div class="google-map" id="contact-google-map"
+                                                        data-map-lat="40.700843" data-map-lng="-74.004012"
+                                                        data-icon-path="images/icons/map-marker.png"
+                                                        data-map-title="Chester" data-map-zoom="11">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
                                         <h4>How Can I Help?</h4>
                                         <!-- Contact Form -->
                                         <div class="contact-form">
                                             <!--Comment Form-->
-                                            <form @submit.prevent="submitContactForm">
+                                            <form method="post" action="sendemail.php" id="contact-form">
                                                 <div class="row clearfix">
+
                                                     <div class="col-md-6 form-group">
-                                                        <input type="text" v-model="contactForm.username" placeholder="Name" required>
+                                                        <input type="text" name="username" placeholder="Name" required>
                                                     </div>
+
                                                     <div class="col-md-6 form-group">
-                                                        <input type="email" v-model="contactForm.email" placeholder="Email" required>
+                                                        <input type="email" name="email" placeholder="Email" required>
                                                     </div>
+
                                                     <div class="col-md-6 form-group">
-                                                        <input type="text" v-model="contactForm.subject" placeholder="Subject" required>
+                                                        <input type="text" name="subject" placeholder="Subject"
+                                                            required>
                                                     </div>
+
                                                     <div class="col-md-6 form-group">
-                                                        <input type="text" v-model="contactForm.phone" placeholder="Phone" required>
+                                                        <input type="text" name="phone" placeholder="Phone" required>
                                                     </div>
+
                                                     <div class="col-lg-12 col-md-12 form-group">
-                                                        <textarea v-model="contactForm.message" placeholder="Message"></textarea>
+                                                        <textarea name="message" placeholder="Message"></textarea>
                                                     </div>
+
                                                     <div class="col-lg-12 col-md-12 form-group">
-                                                        <button class="theme-btn btn-style-two" type="submit">Submit Now</button>
+                                                        <button class="theme-btn btn-style-two" type="submit"
+                                                            name="submit-form">Submit Now </button>
                                                     </div>
+
                                                 </div>
                                             </form>
+
                                         </div>
                                         <!--End Contact Form -->
+
                                     </div>
                                 </div>
                                 <!-- end item -->
@@ -350,11 +438,13 @@
 
                     </div>
                 </div>
+
             </div>
 
         </div>
+        <!--End pagewrapper-->
+
     </div>
-    <!--End pagewrapper-->
 
     <script src="js/jquery.js"></script>
     <script src="js/vue3.js"></script>
@@ -375,12 +465,14 @@
     <script src="js/particle-alone.js"></script>
     <script src="js/script.js"></script>
 
+
     <!--Google Map APi Key-->
     <!-- <script src="http://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script> -->
-   
+
     <!-- <script src="js/gmaps.js"></script>
     <script src="js/map-script.js"></script> -->
-    
+
+
     <!--End Google Map APi-->
 
 </body>

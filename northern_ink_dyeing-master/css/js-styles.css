@@ -1,0 +1,27 @@
+/* JavaScript中提取的样式 */
+
+/* 表单成功消息样式 */
+.form-success-message {
+    background: #4CAF50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+/* 音乐控制按钮样式 */
+.music-control {
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+/* 音乐控制按钮悬停效果 */
+.music-control:hover {
+    opacity: 1 !important;
+}
+
+/* 音乐播放状态样式 */
+.music-control.playing {
+    opacity: 1;
+}
