@@ -2,207 +2,271 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>图片展示</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0;
-			padding: 20px;
-			background-color: #f5f5f5;
-		}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片展示</title>
+    <!-- 禁用右键菜单 -->
+    <script src="./js/limit.js"></script>
+    <script>
+        document.oncontextmenu = function () {
+            return false;
+        }
+    </script>
+    <!-- 禁用选择文本 -->
+    <style>
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
 
-		.container {
-			max-width: 1200px;
-			margin: 0 auto;
-		}
+        /* 禁用图片拖动 */
+        img {
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
 
-		.header {
-			text-align: center;
-			margin-bottom: 30px;
-		}
 
-		.gallery {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 20px;
-			justify-content: center;
-		}
 
-		.image-container {
-			position: relative;
-			overflow: hidden;
-			border-radius: 8px;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-			transition: transform 0.3s ease;
-			background-color: white;
-			padding: 10px;
-		}
+        /* 禁用图片容器上的选择和右键 */
+        .image-container {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: auto;
+        }
+    </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
 
-		.image-container:hover {
-			transform: scale(1.05);
-		}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-		.image-container img {
-			width: 300px;
-			height: 400px;
-			object-fit: cover;
-			display: block;
-		}
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-		.image-name {
-			padding: 8px;
-			text-align: center;
-			font-size: 14px;
-			color: #333;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
 
-		.footer {
-			text-align: center;
-			margin-top: 40px;
-			padding: 20px;
-			color: #666;
-		}
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            background-color: white;
+            padding: 10px;
+        }
 
-		.github-link {
-			display: inline-block;
-			padding: 10px 20px;
-			background-color: #333;
-			color: white;
-			text-decoration: none;
-			border-radius: 4px;
-			margin-bottom: 20px;
-			transition: background-color 0.3s;
-		}
+        .image-container:hover {
+            transform: scale(1.05);
+        }
 
-		.github-link:hover {
-			background-color: #555;
-		}
-	</style>
+        .image-container img {
+            width: 300px;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-name {
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+        }
+
+        .github-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .github-link:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 
 <body>
-	<div class="container">
-		<div class="header">
-			<h1>图片展示</h1>
-			<a href="https://simon-mzg.github.io/resources/" target="_blank" rel="noopener noreferrer"
-				class="github-link">
-				访问 GitHub 资源库
-			</a>
-		</div>
+    <div class="container">
+        <div class="header">
+            <h1>图片展示</h1>
+            <a href="https://simon-mzg.github.io/resources/" target="_blank" rel="noopener noreferrer"
+                class="github-link">
+                访问 GitHub 资源库
+            </a>
+        </div>
 
-		<div class="gallery" id="imageGallery">
-			<!-- 图片将通过JavaScript动态加载 -->
-		</div>
+        <div class="gallery" id="imageGallery">
+            <!-- 图片将通过JavaScript动态加载 -->
+        </div>
 
-		<div class="footer">
-			<p>图片展示页面 - 自动加载 image/xz/ 目录下的所有图片</p>
-		</div>
-	</div>
+        <div class="footer">
+            <p>图片展示页面 - 自动加载 image/xz/ 目录下的所有图片</p>
+        </div>
+    </div>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const gallery = document.getElementById('imageGallery');
-			const imageDir = 'image/xz';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const gallery = document.getElementById('imageGallery');
+            const imageDir = 'image/xz';
 
-			// 尝试获取目录中的所有图片
-			// 注意：由于浏览器安全限制，直接读取本地目录不可行
-			// 这里使用几种可能的解决方案
+            // 尝试获取目录中的所有图片
+            // 注意：由于浏览器安全限制，直接读取本地目录不可行
+            // 这里使用几种可能的解决方案
 
-			// 方法1：尝试获取目录索引（如果服务器启用了目录列表）
-			fetch(imageDir)
-				.then(response => {
-					// 检查响应是否包含HTML（目录列表）
-					const contentType = response.headers.get('content-type');
-					if (contentType && contentType.includes('text/html')) {
-						return response.text();
-					}
-					throw new Error('无法获取目录列表');
-				})
-				.then(html => {
-					// 解析HTML，提取图片文件名
-					const parser = new DOMParser();
-					const doc = parser.parseFromString(html, 'text/html');
-					const links = doc.querySelectorAll('a[href$=".png"], a[href$=".jpg"], a[href$=".jpeg"], a[href$=".gif"], a[href$=".webp"]');
+            // 方法1：尝试获取目录索引（如果服务器启用了目录列表）
+            fetch(imageDir)
+                .then(response => {
+                    // 检查响应是否包含HTML（目录列表）
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('text/html')) {
+                        return response.text();
+                    }
+                    throw new Error('无法获取目录列表');
+                })
+                .then(html => {
+                    // 解析HTML，提取图片文件名
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = doc.querySelectorAll('a[href$=".png"], a[href$=".jpg"], a[href$=".jpeg"], a[href$=".gif"], a[href$=".webp"]');
 
-					if (links.length > 0) {
-						// 如果找到图片链接，创建图片元素
-						links.forEach(link => {
-							let href = link.getAttribute('href');
-							// 确保路径正确拼接，避免双斜杠
-							if (href.startsWith('/')) {
-								href = href.substring(1);
-							}
-							// 手动添加斜杠，因为之前已经移除了imageDir的结尾斜杠
-							const imagePath = href;
+                    if (links.length > 0) {
+                        // 如果找到图片链接，创建图片元素
+                        links.forEach(link => {
+                            let href = link.getAttribute('href');
+                            // 确保路径正确拼接，避免双斜杠
+                            if (href.startsWith('/')) {
+                                href = href.substring(1);
+                            }
+                            // 手动添加斜杠，因为之前已经移除了imageDir的结尾斜杠
+                            const imagePath = href;
 
-							console.log(imagePath)
-							createImageElement(imagePath);
-						});
-					} else {
-						// 如果没有找到图片，使用备用方案
-						loadFallbackImages();
-					}
-				})
-				.catch(error => {
-					console.error('加载目录失败:', error);
-					// 使用备用方案
-					loadFallbackImages();
-				});
+                            console.log(imagePath)
+                            createImageElement(imagePath);
+                        });
+                    } else {
+                        // 如果没有找到图片，使用备用方案
+                        loadFallbackImages();
+                    }
+                })
+                .catch(error => {
+                    console.error('加载目录失败:', error);
+                    // 使用备用方案
+                    loadFallbackImages();
+                });
 
-			// 创建图片元素的函数
-			function createImageElement(imagePath) {
-				const container = document.createElement('div');
-				container.className = 'image-container';
+            // 创建图片元素的函数
+            function createImageElement(imagePath) {
+                const container = document.createElement('div');
+                container.className = 'image-container';
 
-				const img = document.createElement('img');
-				img.src = imagePath;
-				img.alt = imagePath.split('/').pop(); // 获取文件名作为alt文本
-				img.onerror = function () {
-					// 如果图片加载失败，隐藏容器
-					container.style.display = 'none';
-					console.warn('无法加载图片:', imagePath);
-				};
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = imagePath.split('/').pop(); // 获取文件名作为alt文本
 
-				const nameDiv = document.createElement('div');
-				nameDiv.className = 'image-name';
-				// nameDiv.textContent = img.alt;// 图片路径
+                // 防止右键菜单
+                img.oncontextmenu = function () {
+                    return false;
+                };
 
-				container.appendChild(img);
-				container.appendChild(nameDiv);
-				gallery.appendChild(container);
-			}
+                // 防止拖拽
+                img.ondragstart = function () {
+                    return false;
+                };
 
-			// 备用方案：预定义的图片列表
-			function loadFallbackImages() {
-				const fallbackImages = [
-					'videoframe_2381.png',
-					'o0FzINDnAobAlRRAflPpAbYQOAeb19AtbkCgSg~tplv-dy-aweme-images_q75.png',
-					'oYjs9mACrCtEApaRAAIAWxYf4ejgGFEDAjDCtK~tplv-dy-aweme-images_q75.webp'
-				];
+                // 防止长按保存（移动设备）
+                img.ontouchstart = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
 
-				fallbackImages.forEach(imageName => {
-					// 使用与主逻辑相同的路径拼接方式
-					const imagePath = imageDir + '/' + imageName;
-					createImageElement(imagePath);
-				});
+                // 防止双击保存
+                img.ondblclick = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
 
-				// 显示提示信息
-				const infoDiv = document.createElement('div');
-				infoDiv.style.width = '100%';
-				infoDiv.style.textAlign = 'center';
-				infoDiv.style.marginTop = '20px';
-				infoDiv.style.color = '#666';
-				infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的图片列表。';
-				document.querySelector('.container').appendChild(infoDiv);
-			}
-		});
-	</script>
+                // 防止复制
+                img.oncopy = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+                img.onerror = function () {
+                    // 如果图片加载失败，隐藏容器
+                    container.style.display = 'none';
+                    console.warn('无法加载图片:', imagePath);
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'image-name';
+                // nameDiv.textContent = img.alt;// 图片路径
+
+                container.appendChild(img);
+                container.appendChild(nameDiv);
+                gallery.appendChild(container);
+            }
+
+            // 备用方案：预定义的图片列表
+            function loadFallbackImages() {
+                const fallbackImages = [
+                    'videoframe_2381.png',
+                    'o0FzINDnAobAlRRAflPpAbYQOAeb19AtbkCgSg~tplv-dy-aweme-images_q75.png',
+                    'oYjs9mACrCtEApaRAAIAWxYf4ejgGFEDAjDCtK~tplv-dy-aweme-images_q75.webp'
+                ];
+
+                fallbackImages.forEach(imageName => {
+                    // 使用与主逻辑相同的路径拼接方式
+                    const imagePath = imageDir + '/' + imageName;
+                    createImageElement(imagePath);
+                });
+
+                // 显示提示信息
+                const infoDiv = document.createElement('div');
+                infoDiv.style.width = '100%';
+                infoDiv.style.textAlign = 'center';
+                infoDiv.style.marginTop = '20px';
+                infoDiv.style.color = '#666';
+                infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的图片列表。';
+                document.querySelector('.container').appendChild(infoDiv);
+            }
+        });
+    </script>
 </body>
 
 </html>
