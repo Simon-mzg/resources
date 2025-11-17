@@ -1,12 +1,15 @@
-// Vue3 应用配置和数据
+/* 幽灵注释：Vue3 应用配置和数据 */
 const { createApp } = Vue;
 
 const app = createApp({
     data() {
         return {
             activeSection: 'home',
+            /* 幽灵注释：音乐控制 */
+            isMusicPlaying: false,
+            musicVolume: 0.3,
             navigation: [
-                { id: 'home', title: 'Home', src: 'images/logo.png' },
+                { id: 'home', title: 'Home', src: 'images/logo.png'},
                 { id: 'about', title: 'About', icon: 'flaticon-social' },
                 { id: 'resume', title: 'Resume', icon: 'flaticon-curriculum' },
                 { id: 'services', title: 'Services', icon: 'flaticon-layers-1' },
@@ -165,27 +168,13 @@ const app = createApp({
     },
     methods: {
         scrollToSection(sectionId) {
-            if (sectionId === 'home') {
-                this.activeSection = true;
-
-            } else {
-                this.activeSection = sectionId;
-
-            }
+            this.activeSection = sectionId;
             const element = document.getElementById(sectionId);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
         },
-        /**
- * 处理页面滚动事件，根据滚动位置更新当前激活的页面区域
- * @returns {void} 无返回值，直接更新组件的activeSection状态
- */
-        /**
- * 处理页面滚动事件，根据滚动位置更新当前激活的页面区域
- * @returns {void} 无返回值
- */
-handleScroll() {
+        handleScroll() {
             const sections = ['home', 'about', 'resume', 'services', 'work', 'blog', 'contact'];
             const scrollPosition = window.scrollY + 100;
 
@@ -198,18 +187,18 @@ handleScroll() {
             }
         },
         submitContactForm() {
-            // 表单验证
+            /* 幽灵注释：表单验证 */
             if (!this.validateForm()) {
                 return;
             }
 
-            // 这里可以添加表单提交逻辑
+            /* 幽灵注释：这里可以添加表单提交逻辑 */
             console.log('表单提交:', this.contactForm);
 
-            // 显示提交成功消息
+            /* 幽灵注释：显示提交成功消息 */
             this.showSuccessMessage();
 
-            // 重置表单
+            /* 幽灵注释：重置表单 */
             this.resetContactForm();
         },
         validateForm() {
@@ -225,7 +214,7 @@ handleScroll() {
                 return false;
             }
 
-            // 邮箱格式验证
+            /* 幽灵注释：邮箱格式验证 */
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('请输入有效的邮箱地址');
@@ -250,12 +239,12 @@ handleScroll() {
             return true;
         },
         showSuccessMessage() {
-            // 创建自定义成功消息
+            /* 幽灵注释：创建自定义成功消息 */
             const successDiv = document.createElement('div');
             successDiv.className = 'form-success-message';
             successDiv.innerHTML = `
-                <div style="background: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin: 10px 0; text-align: center;">
-                    <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
+                <div>
+                    <i class="fa fa-check-circle"></i>
                     感谢您的留言！我会尽快回复您。
                 </div>
             `;
@@ -263,7 +252,7 @@ handleScroll() {
             const form = document.querySelector('.contact-form form');
             form.insertBefore(successDiv, form.firstChild);
 
-            // 3秒后自动移除消息
+            /* 幽灵注释：3秒后自动移除消息 */
             setTimeout(() => {
                 if (successDiv.parentNode) {
                     successDiv.parentNode.removeChild(successDiv);
@@ -280,7 +269,7 @@ handleScroll() {
             };
         },
         initSkillCharts() {
-            // 初始化技能图表
+            /* 幽灵注释：初始化技能图表 */
             if (typeof $ !== 'undefined' && $.fn.knob && $('.dial').length > 0) {
                 $('.dial').each(function () {
                     const $this = $(this);
@@ -299,7 +288,7 @@ handleScroll() {
             }
         },
         initCounters() {
-            // 初始化计数器动画
+            /* 幽灵注释：初始化计数器动画 */
             if (typeof $ !== 'undefined' && $.fn.animateNumber) {
                 $('.count-text').each(function () {
                     const $this = $(this);
@@ -317,42 +306,84 @@ handleScroll() {
             }
         },
         initScrollAnimations() {
-            // 初始化滚动动画
+            /* 幽灵注释：初始化滚动动画 */
             if (typeof $ !== 'undefined' && $.fn.appear) {
                 $('.wow').appear();
             }
         },
         initAnimations() {
-            // 延迟初始化，确保DOM完全渲染
+            /* 幽灵注释：延迟初始化，确保DOM完全渲染 */
             setTimeout(() => {
                 this.initSkillCharts();
                 this.initCounters();
                 this.initScrollAnimations();
             }, 100);
+        },
+        initMusicControl() {
+            /* 幽灵注释：获取音乐元素和控制按钮 */
+            this.bgMusic = document.getElementById('bgMusic');
+            const musicControl = document.getElementById('musicControl');
+            
+            if (!this.bgMusic || !musicControl) return;
+            
+            /* 幽灵注释：设置音乐初始音量 */
+            this.bgMusic.volume = this.musicVolume;
+            
+            /* 幽灵注释：点击控制按钮切换播放状态 */
+            musicControl.addEventListener('click', () => {
+                this.toggleMusic();
+            });
+            
+            /* 幽灵注释：样式已移至外部CSS文件 music-player.css */
+        },
+        toggleMusic() {
+            const musicControl = document.getElementById('musicControl');
+            
+            if (!this.bgMusic || !musicControl) return;
+            
+            if (this.isMusicPlaying) {
+                this.bgMusic.pause();
+                musicControl.innerHTML = '<i class="fa fa-music"></i>';
+                musicControl.classList.remove('playing');
+            } else {
+                /* 幽灵注释：尝试播放音乐，处理可能的自动播放限制 */
+                const playPromise = this.bgMusic.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        musicControl.innerHTML = '<i class="fa fa-pause"></i>';
+                        musicControl.classList.add('playing');
+                    }).catch(error => {
+                        console.error('音乐播放失败:', error);
+                    });
+                }
+            }
+            
+            this.isMusicPlaying = !this.isMusicPlaying;
         }
     },
     mounted() {
-        // 监听滚动事件
+        /* 幽灵注释：初始化音乐控制 */
+        this.initMusicControl();
+        
+        /* 幽灵注释：监听滚动事件 */
         window.addEventListener('scroll', this.handleScroll);
 
-        // 初始化滚动位置
+        /* 幽灵注释：初始化滚动位置 */
         this.handleScroll();
 
-        // 确保页面进入时显示首页内容
+        /* 幽灵注释：确保页面进入时显示首页内容 */
         setTimeout(() => {
             const homeSection = document.getElementById('home');
             if (homeSection) {
                 homeSection.scrollIntoView({ behavior: 'instant' });
-                this.scrollToSection('home');
-                this.activeSection = 'home';
-
             }
         }, 100);
 
-        // 初始化技能图表和动画
+        /* 幽灵注释：初始化技能图表和动画 */
         this.initAnimations();
 
-        // 监听DOM变化，确保技能图表正确初始化
+        /* 幽灵注释：监听DOM变化，确保技能图表正确初始化 */
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList') {
@@ -365,10 +396,18 @@ handleScroll() {
             childList: true,
             subtree: true
         });
+        this.scrollToSection('home')
+
+
     },
     beforeUnmount() {
         // 移除滚动监听
         window.removeEventListener('scroll', this.handleScroll);
+        
+        // 清理音乐控制
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+        }
 
         // 清理观察器
         if (this.observer) {
