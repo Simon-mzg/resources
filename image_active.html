@@ -63,6 +63,7 @@
             -ms-user-select: none;
             user-select: none;
             pointer-events: auto;
+            cursor: pointer;
         }
 
         .image-container:hover, .video-container:hover {
@@ -320,8 +321,8 @@
             }
         }
         
-        /* PDF全屏模态框样式 */
-        .pdf-modal {
+        /* 全屏模态框样式 */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -338,12 +339,12 @@
             transition: all 0.3s ease;
         }
         
-        .pdf-modal.show {
+        .modal.show {
             opacity: 1;
             visibility: visible;
         }
         
-        .pdf-modal-header {
+        .modal-header {
             width: 100%;
             padding: 15px 30px;
             display: flex;
@@ -353,7 +354,7 @@
             color: white;
         }
         
-        .pdf-modal-title {
+        .modal-title {
             font-size: 18px;
             font-weight: bold;
             margin: 0;
@@ -365,7 +366,7 @@
             text-overflow: ellipsis;
         }
         
-        .pdf-modal-close {
+        .modal-close {
             position: absolute;
             right: 20px;
             background: none;
@@ -382,41 +383,50 @@
             transition: background-color 0.3s;
         }
         
-        .pdf-modal-close:hover {
+        .modal-close:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
         
-        .pdf-modal-content {
+        .modal-content {
             width: 90%;
             height: 80%;
             background-color: white;
             border-radius: 8px;
             overflow: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .pdf-modal-content iframe {
+        .modal-content img, .modal-content video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .modal-content iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
         
-        /* 移动端PDF模态框适配 */
+        /* 移动端模态框适配 */
         @media (max-width: 768px) {
-            .pdf-modal-content {
+            .modal-content {
                 width: 95%;
                 height: 85%;
             }
             
-            .pdf-modal-header {
+            .modal-header {
                 padding: 10px 15px;
             }
             
-            .pdf-modal-title {
+            .modal-title {
                 font-size: 16px;
             }
             
-            .pdf-modal-close {
+            .modal-close {
                 right: 15px;
                 font-size: 20px;
             }
@@ -461,14 +471,14 @@
         </div>
     </div>
     
-    <!-- PDF全屏模态框 -->
-    <div class="pdf-modal" id="pdfModal">
-        <div class="pdf-modal-header">
-            <h2 class="pdf-modal-title" id="pdfModalTitle">PDF文档</h2>
-            <button class="pdf-modal-close" id="pdfModalClose">&times;</button>
+    <!-- 全屏模态框 -->
+    <div class="modal" id="mediaModal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">媒体文件</h2>
+            <button class="modal-close" id="modalClose">&times;</button>
         </div>
-        <div class="pdf-modal-content">
-            <iframe id="pdfModalFrame" src=""></iframe>
+        <div class="modal-content" id="modalContent">
+            <!-- 内容将通过JavaScript动态加载 -->
         </div>
     </div>
     
@@ -483,10 +493,10 @@
             const videoGallery = document.getElementById('videoGallery');
             const pdfGallery = document.getElementById('pdfGallery');
             const backToTopButton = document.getElementById('backToTop');
-            const pdfModal = document.getElementById('pdfModal');
-            const pdfModalTitle = document.getElementById('pdfModalTitle');
-            const pdfModalFrame = document.getElementById('pdfModalFrame');
-            const pdfModalClose = document.getElementById('pdfModalClose');
+            const mediaModal = document.getElementById('mediaModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            const modalClose = document.getElementById('modalClose');
             const imageDir = 'image/xz';
             const videoDir = 'image/xz'; 
 
@@ -672,7 +682,7 @@
 
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'image-name';
-                // nameDiv.textContent = img.alt;// 图片路径
+                nameDiv.textContent = imagePath.split('/').pop(); // 显示文件名
 
                 // 先添加占位符，然后添加图片(此时图片还未加载)
                 container.appendChild(placeholder);
@@ -684,6 +694,11 @@
 
                 // 将容器添加到观察器，实现懒加载
                 lazyLoadObserver.observe(container);
+                
+                // 添加点击事件，用于全屏显示图片
+                container.addEventListener('click', function() {
+                    openMediaModal('image', imagePath, nameDiv.textContent);
+                });
             }
 
             // 移除加载提示的函数
@@ -886,6 +901,11 @@
 
                 // 将容器添加到观察器，实现懒加载
                 lazyLoadObserver.observe(container);
+                
+                // 添加点击事件，用于全屏显示视频
+                container.addEventListener('click', function() {
+                    openMediaModal('video', videoPath, nameDiv.textContent);
+                });
             }
 
             // 备用方案：预定义的视频列表
@@ -1018,7 +1038,7 @@
                 
                 // 添加点击事件，用于全屏显示PDF
                 container.addEventListener('click', function() {
-                    openPdfModal(pdfPath, nameDiv.textContent);
+                    openMediaModal('pdf', pdfPath, nameDiv.textContent);
                 });
             }
 
@@ -1049,56 +1069,77 @@
                 document.querySelector('.container').appendChild(infoDiv);
             }
             
-            // 打开PDF全屏模态框
-            function openPdfModal(pdfPath, title) {
+            // 打开全屏模态框
+            function openMediaModal(type, path, title) {
+                // 清空之前的内容
+                modalContent.innerHTML = '';
+                
                 // 设置模态框标题
-                pdfModalTitle.textContent = title || 'PDF文档';
+                modalTitle.textContent = title || '媒体文件';
                 
-                // 构建PDF查看器URL
-                const viewerUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=';
-                let fullPdfPath = pdfPath;
-                
-                if (!pdfPath.startsWith('http')) {
-                    // 如果是相对路径，转换为绝对路径
-                    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
-                    fullPdfPath = baseUrl + '/' + pdfPath;
+                // 根据类型创建相应元素
+                let element;
+                if (type === 'image') {
+                    element = document.createElement('img');
+                    element.src = path;
+                    element.alt = title;
+                } else if (type === 'video') {
+                    element = document.createElement('video');
+                    element.src = path;
+                    element.controls = true;
+                    element.autoplay = true;
+                } else if (type === 'pdf') {
+                    // 构建PDF查看器URL
+                    const viewerUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=';
+                    let fullPdfPath = path;
+                    
+                    if (!path.startsWith('http')) {
+                        // 如果是相对路径，转换为绝对路径
+                        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+                        fullPdfPath = baseUrl + '/' + path;
+                    }
+                    
+                    element = document.createElement('iframe');
+                    element.src = viewerUrl + encodeURIComponent(fullPdfPath);
                 }
                 
-                // 设置iframe源
-                pdfModalFrame.src = viewerUrl + encodeURIComponent(fullPdfPath);
+                // 添加元素到模态框内容区
+                if (element) {
+                    modalContent.appendChild(element);
+                }
                 
                 // 显示模态框
-                pdfModal.classList.add('show');
+                mediaModal.classList.add('show');
                 
                 // 防止背景滚动
                 document.body.style.overflow = 'hidden';
             }
             
-            // 关闭PDF全屏模态框
-            function closePdfModal() {
-                pdfModal.classList.remove('show');
+            // 关闭全屏模态框
+            function closeMediaModal() {
+                mediaModal.classList.remove('show');
                 // 恢复背景滚动
                 document.body.style.overflow = '';
-                // 清空iframe源以停止PDF渲染
+                // 清空模态框内容以释放资源
                 setTimeout(() => {
-                    pdfModalFrame.src = '';
+                    modalContent.innerHTML = '';
                 }, 300);
             }
             
             // 绑定关闭事件
-            pdfModalClose.addEventListener('click', closePdfModal);
+            modalClose.addEventListener('click', closeMediaModal);
             
             // 点击模态框背景关闭
-            pdfModal.addEventListener('click', function(e) {
-                if (e.target === pdfModal) {
-                    closePdfModal();
+            mediaModal.addEventListener('click', function(e) {
+                if (e.target === mediaModal) {
+                    closeMediaModal();
                 }
             });
             
-            // 按ESC键关闭模态框
-            文档.addEventListener('keydown', function(e) {
-                如果 (e.key === 'Escape' && pdfModal.classList.包含('show')) {
-                    closePdfModal();
+            // ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mediaModal.classList.contains('show')) {
+                    closeMediaModal();
                 }
             });
             
