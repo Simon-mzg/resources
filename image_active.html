@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片与视频展示</title>
+    <!-- 禁用右键菜单 -->
+    <!-- <script src="./js/limit.js"></script> -->
+    
+    <!-- 整合的样式 -->
+    <style>
+        /* 基础样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* 布局样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* 图片和视频容器样式 */
+        .image-container, .video-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            background-color: white;
+            padding: 10px;
+            width: 300px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: auto;
+        }
+
+        .image-container:hover, .video-container:hover {
+            transform: scale(1.05);
+        }
+
+        /* 图片样式 */
+        .image-container img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            touch-action: manipulation; /* 改善移动端触摸体验 */
+        }
+
+        /* 视频样式 */
+        .video-container video {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+            touch-action: manipulation; /* 改善移动端触摸体验 */
+        }
+
+        /* 名称样式 */
+        .image-name, .video-name {
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 链接样式 */
+        .github-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .github-link:hover {
+            background-color: #555;
+        }
+
+        /* 加载提示样式 */
+        .loading-message {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* 懒加载样式 */
+        .lazy-load {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .lazy-loaded {
+            opacity: 1;
+        }
+
+        /* 占位符样式 */
+        .image-placeholder, .video-placeholder, .pdf-placeholder {
+            width: 100%;
+            height: 400px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* 按钮容器样式 */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            flex-wrap: wrap; /* 在小屏幕上换行 */
+        }
+
+        /* 按钮样式 */
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: #eee;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px; /* 最小宽度确保按钮可点击 */
+        }
+
+        .tab-btn:hover {
+            background-color: #ddd;
+        }
+
+        .tab-btn.active {
+            background-color: #333;
+            color: white;
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none;
+        }
+
+        /* PDF容器样式 */
+        .pdf-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            background-color: white;
+            padding: 10px;
+            width: 300px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .pdf-container:hover {
+            transform: scale(1.05);
+        }
+
+        .pdf-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+
+        .pdf-name {
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .gallery {
+                gap: 15px;
+            }
+            
+            .image-container, .video-container, .pdf-container {
+                width: calc(50% - 10px); /* 一行两个 */
+                padding: 5px;
+            }
+            
+            .image-container img, 
+            .video-container video,
+            .image-placeholder, 
+            .video-placeholder, 
+            .pdf-placeholder,
+            .pdf-container iframe {
+                height: 200px;
+            }
+            
+            .tab-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .image-container, .video-container, .pdf-container {
+                width: 100%; /* 一行一个 */
+            }
+            
+            .button-container {
+                gap: 5px;
+            }
+            
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 13px;
+                min-width: 70px;
+            }
+        }
+        
+        /* 返回顶部按钮样式 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .back-to-top:hover {
+            background-color: #555;
+            transform: translateY(-3px);
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 在小屏幕上调整位置 */
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+        
+        /* PDF全屏模态框样式 */
+        .pdf-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .pdf-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .pdf-modal-header {
+            width: 100%;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+        }
+        
+        .pdf-modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+            padding-right: 40px; /* 为关闭按钮留空间 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .pdf-modal-close {
+            position: absolute;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .pdf-modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .pdf-modal-content {
+            width: 90%;
+            height: 80%;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .pdf-modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* 移动端PDF模态框适配 */
+        @media (max-width: 768px) {
+            .pdf-modal-content {
+                width: 95%;
+                height: 85%;
+            }
+            
+            .pdf-modal-header {
+                padding: 10px 15px;
+            }
+            
+            .pdf-modal-title {
+                font-size: 16px;
+            }
+            
+            .pdf-modal-close {
+                right: 15px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>图片与视频展示</h1>
+            <div class="button-container">
+                <button id="imageBtn" class="tab-btn active">图片</button>
+                <button id="videoBtn" class="tab-btn">视频</button>
+                <button id="pdfBtn" class="tab-btn">PDF</button>
+            </div>
+            <a href="https://simon-mzg.github.io/resources/" target="_blank" rel="noopener noreferrer"
+                class="github-link">
+                访问 GitHub 资源库
+            </a>
+        </div>
+
+        <div class="gallery-container">
+            <div class="gallery" id="imageGallery">
+                <div class="loading-message">正在加载图片...</div>
+                <!-- 图片将通过JavaScript动态加载 -->
+            </div>
+
+            <div class="gallery hidden" id="videoGallery">
+                <div class="loading-message">正在加载视频...</div>
+                <!-- 视频将通过JavaScript动态加载 -->
+            </div>
+
+            <div class="gallery hidden" id="pdfGallery">
+                <div class="loading-message">正在加载PDF...</div>
+                <!-- PDF将通过JavaScript动态加载 -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>图片、视频与PDF展示页面 - 自动加载 image/xz/ 目录下的所有文件</p>
+        </div>
+    </div>
+    
+    <!-- PDF全屏模态框 -->
+    <div class="pdf-modal" id="pdfModal">
+        <div class="pdf-modal-header">
+            <h2 class="pdf-modal-title" id="pdfModalTitle">PDF文档</h2>
+            <button class="pdf-modal-close" id="pdfModalClose">&times;</button>
+        </div>
+        <div class="pdf-modal-content">
+            <iframe id="pdfModalFrame" src=""></iframe>
+        </div>
+    </div>
+    
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="返回顶部">
+        ↑
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageGallery = document.getElementById('imageGallery');
+            const videoGallery = document.getElementById('videoGallery');
+            const pdfGallery = document.getElementById('pdfGallery');
+            const backToTopButton = document.getElementById('backToTop');
+            const pdfModal = document.getElementById('pdfModal');
+            const pdfModalTitle = document.getElementById('pdfModalTitle');
+            const pdfModalFrame = document.getElementById('pdfModalFrame');
+            const pdfModalClose = document.getElementById('pdfModalClose');
+            const imageDir = 'image/xz';
+            const videoDir = 'image/xz'; 
+
+            // 创建Intersection Observer实例用于懒加载
+            const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+
+                        // 如果是图片容器
+                        if (element.classList.contains('image-container')) {
+                            const img = element.querySelector('img');
+                            const placeholder = element.querySelector('.image-placeholder');
+                            if (img && img.dataset.src) {
+                                img.src = img.dataset.src;
+                                img.onload = () => {
+                                    // 隐藏占位符
+                                    if (placeholder) {
+                                        placeholder.style.display = 'none';
+                                    }
+                                    element.classList.add('lazy-loaded');
+                                    element.classList.remove('lazy-load');
+                                };
+                                observer.unobserve(element);
+                            }
+                        }
+
+                        // 如果是视频容器
+                        if (element.classList.contains('video-container')) {
+                            const video = element.querySelector('video');
+                            const placeholder = element.querySelector('.video-placeholder');
+                            if (video && video.dataset.src) {
+                                video.src = video.dataset.src;
+                                video.load();
+                                // 隐藏占位符
+                                if (placeholder) {
+                                    placeholder.style.display = 'none';
+                                }
+                                element.classList.add('lazy-loaded');
+                                element.classList.remove('lazy-load');
+                                observer.unobserve(element);
+                            }
+                        }
+
+                        // 如果是PDF容器
+                        if (element.classList.contains('pdf-container')) {
+                            const iframe = element.querySelector('iframe');
+                            const placeholder = element.querySelector('.pdf-placeholder');
+
+                            if (iframe && iframe.dataset.src && placeholder) {
+                                // 设置PDF查看器URL，确保正确显示PDF
+                                const viewerUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=';
+                                const pdfPath = iframe.dataset.src;
+
+                                if (!pdfPath.startsWith('http')) {
+                                    // 如果是相对路径，转换为绝对路径
+                                    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+                                    iframe.src = viewerUrl + encodeURIComponent(baseUrl + '/' + pdfPath);
+                                } else {
+                                    iframe.src = viewerUrl + encodeURIComponent(pdfPath);
+                                }
+
+                                // 隐藏占位符
+                                placeholder.style.display = 'none';
+
+                                element.classList.add('lazy-loaded');
+                                element.classList.remove('lazy-load');
+                                observer.unobserve(element);
+                            }
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px', // 增加触发范围以改善移动端体验
+                threshold: 0.1
+            });
+
+            // 尝试获取目录中的所有图片
+            // 注意：由于浏览器安全限制，直接读取本地目录不可行
+            // 这里使用几种可能的解决方案
+
+            // 方法1：尝试获取目录索引（如果服务器启用了目录列表）
+            fetch(imageDir)
+                .then(response => {
+                    // 检查响应是否包含HTML（目录列表）
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('text/html')) {
+                        return response.text();
+                    }
+                    throw new Error('无法获取目录列表');
+                })
+                .then(html => {
+                    // 解析HTML，提取图片文件名
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = doc.querySelectorAll('a[href$=".png"], a[href$=".jpg"], a[href$=".jpeg"], a[href$=".gif"], a[href$=".webp"]');
+
+                    if (links.length > 0) {
+                        // 如果找到图片链接，创建图片元素
+                        links.forEach(link => {
+                            let href = link.getAttribute('href');
+                            // 确保路径正确拼接，避免双斜杠
+                            if (href.startsWith('/')) {
+                                href = href.substring(1);
+                            }
+                            // 手动添加斜杠，因为之前已经移除了imageDir的结尾斜杠
+                            const imagePath = href;
+
+                            // console.log(imagePath)
+                            createImageElement(imagePath, imageGallery);
+                        });
+
+                        // 移除加载提示
+                        removeLoadingMessage(imageGallery);
+                    } else {
+                        // 如果没有找到图片，使用备用方案
+                        loadFallbackImages(imageGallery);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载目录失败:', error);
+                    // 使用备用方案
+                    loadFallbackImages(imageGallery);
+                });
+
+            // 创建图片元素的函数
+            function createImageElement(imagePath, gallery) {
+                const container = document.createElement('div');
+                container.className = 'image-container lazy-load';
+
+                // 创建占位符
+                const placeholder = document.createElement('div');
+                placeholder.className = 'image-placeholder';
+                placeholder.textContent = '图片加载中...';
+
+                const img = document.createElement('img');
+                // 使用data-src存储真实图片地址，实现懒加载
+                img.dataset.src = imagePath;
+                img.alt = imagePath.split('/').pop(); // 获取文件名作为alt文本
+
+                // 防止右键菜单
+                img.oncontextmenu = function () {
+                    return false;
+                };
+
+                // 防止拖拽
+                img.ondragstart = function () {
+                    return false;
+                };
+
+                // 防止长按保存（移动设备）
+                img.ontouchstart = function (e) {
+                    // 阻止默认的长按菜单
+                    e.preventDefault();
+                    return false;
+                };
+                
+                // 阻止触摸移动时的默认行为
+                img.ontouchmove = function(e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止双击保存
+                img.ondblclick = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止复制
+                img.oncopy = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+                img.onerror = function () {
+                    // 如果图片加载失败，删除容器
+                    container.remove();
+                    console.warn('无法加载图片:', imagePath);
+
+                    // 移除观察器
+                    lazyLoadObserver.unobserve(container);
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'image-name';
+                // nameDiv.textContent = img.alt;// 图片路径
+
+                // 先添加占位符，然后添加图片(此时图片还未加载)
+                container.appendChild(placeholder);
+                container.appendChild(img);
+                container.appendChild(nameDiv);
+
+                // 添加到画廊
+                gallery.appendChild(container);
+
+                // 将容器添加到观察器，实现懒加载
+                lazyLoadObserver.observe(container);
+            }
+
+            // 移除加载提示的函数
+            function removeLoadingMessage(gallery) {
+                const loadingMessage = gallery.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.remove();
+                }
+            }
+
+            // 备用方案：预定义的图片列表
+            function loadFallbackImages(gallery) {
+                // 移除加载提示
+                removeLoadingMessage(gallery);
+
+                const fallbackImages = [
+                    'videoframe_2381.png',
+                    'o0FzINDnAobAlRRAflPpAbYQOAeb19AtbkCgSg~tplv-dy-aweme-images_q75.png',
+                    'oYjs9mACrCtEApaRAAIAWxYf4ejgGFEDAjDCtK~tplv-dy-aweme-images_q75.webp'
+                ];
+
+                fallbackImages.forEach(imageName => {
+                    // 使用与主逻辑相同的路径拼接方式
+                    const imagePath = imageDir + '/' + imageName;
+                    createImageElement(imagePath, gallery);
+                });
+
+                // 显示提示信息
+                const infoDiv = document.createElement('div');
+                infoDiv.style.width = '100%';
+                infoDiv.style.textAlign = 'center';
+                infoDiv.style.marginTop = '20px';
+                infoDiv.style.color = '#666';
+                infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的图片列表。';
+                document.querySelector('.container').appendChild(infoDiv);
+            }
+
+            // 添加按钮点击事件
+            document.getElementById('imageBtn').addEventListener('click', function() {
+                showGallery('image');
+            });
+
+            document.getElementById('videoBtn').addEventListener('click', function() {
+                showGallery('video');
+            });
+
+            document.getElementById('pdfBtn').addEventListener('click', function() {
+                showGallery('pdf');
+            });
+
+            // 加载视频
+            loadVideos();
+
+            // 加载PDF
+            loadPDFs();
+
+            // 显示指定画廊的函数
+            function showGallery(type) {
+                // 隐藏所有画廊
+                document.getElementById('imageGallery').classList.add('hidden');
+                document.getElementById('videoGallery').classList.add('hidden');
+                document.getElementById('pdfGallery').classList.add('hidden');
+
+                // 移除所有按钮的active类
+                document.getElementById('imageBtn').classList.remove('active');
+                document.getElementById('videoBtn').classList.remove('active');
+                document.getElementById('pdfBtn').classList.remove('active');
+
+                // 显示指定画廊并添加active类到对应按钮
+                if (type === 'image') {
+                    document.getElementById('imageGallery').classList.remove('hidden');
+                    document.getElementById('imageBtn').classList.add('active');
+                } else if (type === 'video') {
+                    document.getElementById('videoGallery').classList.remove('hidden');
+                    document.getElementById('videoBtn').classList.add('active');
+                } else if (type === 'pdf') {
+                    document.getElementById('pdfGallery').classList.remove('hidden');
+                    document.getElementById('pdfBtn').classList.add('active');
+                }
+            }
+
+            function loadVideos() {
+                // 方法1：尝试获取目录索引（如果服务器启用了目录列表）
+                fetch(videoDir)
+                    .then(response => {
+                        // 检查响应是否包含HTML（目录列表）
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text();
+                        }
+                        throw new Error('无法获取视频目录列表');
+                    })
+                    .then(html => {
+                        // 解析HTML，提取视频文件名
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const links = doc.querySelectorAll('a[href$=".mp4"], a[href$=".webm"], a[href$=".ogg"], a[href$=".avi"], a[href$=".mov"]');
+
+                        if (links.length > 0) {
+                            // 如果找到视频链接，创建视频元素
+                            links.forEach(link => {
+                                let href = link.getAttribute('href');
+                                // console.log(href);
+                                // 确保路径正确拼接，避免双斜杠
+                                if (href.startsWith('/')) {
+                                    href = href.substring(1);
+                                }
+                                // 手动添加斜杠，因为之前已经移除了videoDir的结尾斜杠
+                                const videoPath = href;
+
+                                // console.log(videoPath);
+                                createVideoElement(videoPath);
+                            });
+
+                            // 移除加载提示
+                            removeLoadingMessage(videoGallery);
+                        } else {
+                            // 如果没有找到视频，使用备用方案
+                            loadFallbackVideos();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载视频目录失败:', error);
+                        // 使用备用方案
+                        loadFallbackVideos();
+                    });
+            }
+
+            // 创建视频元素的函数
+            function createVideoElement(videoPath) {
+                const container = document.createElement('div');
+                container.className = 'video-container lazy-load';
+
+                // 创建占位符
+                const placeholder = document.createElement('div');
+                placeholder.className = 'video-placeholder';
+                placeholder.textContent = '视频加载中...';
+
+                const video = document.createElement('video');
+                // 使用data-src存储真实视频地址，实现懒加载
+                video.dataset.src = videoPath;
+                video.controls = true; // 显示视频控制条
+                video.preload = 'metadata'; // 预加载元数据
+
+                // 防止右键菜单
+                video.oncontextmenu = function () {
+                    return false;
+                };
+
+                // 防止拖拽
+                video.ondragstart = function () {
+                    return false;
+                };
+
+                // 防止长按保存（移动设备）
+                video.ontouchstart = function (e) {
+                    // 阻止默认的长按菜单
+                    e.preventDefault();
+                    return false;
+                };
+                
+                // 阻止触摸移动时的默认行为
+                video.ontouchmove = function(e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止双击保存
+                video.ondblclick = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                // 防止复制
+                video.oncopy = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                video.onerror = function () {
+                    // 如果视频加载失败，删除容器
+                    container.remove();
+                    console.warn('无法加载视频:', videoPath);
+
+                    // 移除观察器
+                    lazyLoadObserver.unobserve(container);
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'video-name';
+                nameDiv.textContent = videoPath.split('/').pop(); // 获取文件名作为视频名称
+
+                // 先添加占位符，然后添加视频(此时视频还未加载)
+                container.appendChild(placeholder);
+                container.appendChild(video);
+                container.appendChild(nameDiv);
+
+                // 添加到画廊
+                videoGallery.appendChild(container);
+
+                // 将容器添加到观察器，实现懒加载
+                lazyLoadObserver.observe(container);
+            }
+
+            // 备用方案：预定义的视频列表
+            function loadFallbackVideos() {
+                // 移除加载提示
+                removeLoadingMessage(videoGallery);
+
+                const fallbackVideos = [
+                    '下载 (1).mp4',
+                    '下载 (2).mp4',
+                    '下载 (3).mp4'
+                ];
+
+                fallbackVideos.forEach(videoName => {
+                    // 使用与主逻辑相同的路径拼接方式
+                    const videoPath = videoDir + '/' + videoName;
+                    createVideoElement(videoPath);
+                });
+
+                // 显示提示信息
+                const infoDiv = document.createElement('div');
+                infoDiv.style.width = '100%';
+                infoDiv.style.textAlign = 'center';
+                infoDiv.style.marginTop = '20px';
+                infoDiv.style.color = '#666';
+                infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的视频列表。';
+                document.querySelector('.container').appendChild(infoDiv);
+            }
+
+            // 加载PDF
+            function loadPDFs() {
+                // 方法1：尝试获取目录索引（如果服务器启用了目录列表）
+                fetch('image')
+                    .then(response => {
+                        // 检查响应是否包含HTML（目录列表）
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text();
+                        }
+                        throw new Error('无法获取PDF目录列表');
+                    })
+                    .then(html => {
+                        // 解析HTML，提取PDF文件名
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const links = doc.querySelectorAll('a[href$=".pdf"]');
+
+                        if (links.length > 0) {
+                            // 如果找到PDF链接，创建PDF元素
+                            links.forEach(link => {
+                                let href = link.getAttribute('href');
+                                // 确保路径正确拼接，避免双斜杠
+                                if (href.startsWith('/')) {
+                                    href = href.substring(1);
+                                }
+                                // 手动添加斜杠，因为之前已经移除了目录的结尾斜杠
+                                const pdfPath = href;
+
+                                createPdfElement(pdfPath);
+                            });
+
+                            // 移除加载提示
+                            removeLoadingMessage(pdfGallery);
+                        } else {
+                            // 如果没有找到PDF，使用备用方案
+                            loadFallbackPdfs();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载PDF目录失败:', error);
+                        // 使用备用方案
+                        loadFallbackPdfs();
+                    });
+            }
+
+            // 创建PDF元素的函数
+            function createPdfElement(pdfPath) {
+                const container = document.createElement('div');
+                container.className = 'pdf-container lazy-load';
+
+                // 创建占位符
+                const placeholder = document.createElement('div');
+                placeholder.className = 'pdf-placeholder';
+                placeholder.textContent = 'PDF加载中...';
+
+                const iframe = document.createElement('iframe');
+                // 使用data-src存储真实PDF地址，实现懒加载
+                iframe.dataset.src = pdfPath;
+                // 不在这里设置src，而是在懒加载时设置
+
+                // 防止右键菜单
+                iframe.oncontextmenu = function () {
+                    return false;
+                };
+                
+                // 阻止触摸操作
+                iframe.ontouchstart = function(e) {
+                    e.preventDefault();
+                    return false;
+                };
+                
+                iframe.ontouchmove = function(e) {
+                    e.preventDefault();
+                    return false;
+                };
+
+                iframe.onerror = function () {
+                    // 如果PDF加载失败，删除容器
+                    container.remove();
+                    console.warn('无法加载PDF:', pdfPath);
+
+                    // 移除观察器
+                    lazyLoadObserver.unobserve(container);
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'pdf-name';
+                nameDiv.textContent = pdfPath.split('/').pop(); // 获取文件名作为PDF名称
+
+                // 先添加占位符，然后添加iframe(此时PDF还未加载)
+                container.appendChild(placeholder);
+                container.appendChild(iframe);
+                container.appendChild(nameDiv);
+
+                // 添加到画廊
+                pdfGallery.appendChild(container);
+
+                // 将容器添加到观察器，实现懒加载
+                lazyLoadObserver.observe(container);
+                
+                // 添加点击事件，用于全屏显示PDF
+                container.addEventListener('click', function() {
+                    openPdfModal(pdfPath, nameDiv.textContent);
+                });
+            }
+
+            // 备用方案：预定义的PDF列表
+            function loadFallbackPdfs() {
+                // 移除加载提示
+                removeLoadingMessage(pdfGallery);
+
+                const fallbackPdfs = [
+                    'sample1.pdf',
+                    'sample2.pdf',
+                    'sample3.pdf'
+                ];
+
+                fallbackPdfs.forEach(pdfName => {
+                    // 使用与主逻辑相同的路径拼接方式
+                    const pdfPath = 'image/xz' + '/' + pdfName;
+                    createPdfElement(pdfPath);
+                });
+
+                // 显示提示信息
+                const infoDiv = document.createElement('div');
+                infoDiv.style.width = '100%';
+                infoDiv.style.textAlign = 'center';
+                infoDiv.style.marginTop = '20px';
+                infoDiv.style.color = '#666';
+                infoDiv.textContent = '注意：由于浏览器安全限制，无法直接读取本地目录。显示的是预定义的PDF列表。';
+                document.querySelector('.container').appendChild(infoDiv);
+            }
+            
+            // 打开PDF全屏模态框
+            function openPdfModal(pdfPath, title) {
+                // 设置模态框标题
+                pdfModalTitle.textContent = title || 'PDF文档';
+                
+                // 构建PDF查看器URL
+                const viewerUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=';
+                let fullPdfPath = pdfPath;
+                
+                if (!pdfPath.startsWith('http')) {
+                    // 如果是相对路径，转换为绝对路径
+                    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+                    fullPdfPath = baseUrl + '/' + pdfPath;
+                }
+                
+                // 设置iframe源
+                pdfModalFrame.src = viewerUrl + encodeURIComponent(fullPdfPath);
+                
+                // 显示模态框
+                pdfModal.classList.add('show');
+                
+                // 防止背景滚动
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // 关闭PDF全屏模态框
+            function closePdfModal() {
+                pdfModal.classList.remove('show');
+                // 恢复背景滚动
+                document.body.style.overflow = '';
+                // 清空iframe源以停止PDF渲染
+                setTimeout(() => {
+                    pdfModalFrame.src = '';
+                }, 300);
+            }
+            
+            // 绑定关闭事件
+            pdfModalClose.addEventListener('click', closePdfModal);
+            
+            // 点击模态框背景关闭
+            pdfModal.addEventListener('click', function(e) {
+                if (e.target === pdfModal) {
+                    closePdfModal();
+                }
+            });
+            
+            // 按ESC键关闭模态框
+            文档.addEventListener('keydown', function(e) {
+                如果 (e.key === 'Escape' && pdfModal.classList.包含('show')) {
+                    closePdfModal();
+                }
+            });
+            
+            // 返回顶部按钮功能
+            // 监听滚动事件，控制按钮显示/隐藏
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('show');
+                } else {
+                    backToTopButton.classList.remove('show');
+                }
+            });
+            
+            // 点击返回顶部
+            backToTopButton.addEventListener('click', function() {
+                // 平滑滚动到顶部
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
